@@ -1,0 +1,9 @@
+NORTH = [0, -1]
+SOUTH = [0, 1]
+EAST = [1, 0]
+WEST = [-1, 0]
+DOMAIN_SETTING = "domain/example_domain"
+REWARD_DELIVERY = 10
+REWARD_ERROR = -1
+REWARD_TARGET = 10
+PASSENGER_COLOR = "R"
