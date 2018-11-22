@@ -29,14 +29,22 @@ class Taxi(object):
             assert (len(position) == 2), "The position variable must be a list of length 2"
             assert (self.authorized_positions[position[0]][position[1]]), "This position is not allowed by the geometry of the domain. You can omit this variable to get a random allowed position."
             self.position = position
-                
 
-            
-    def learn(self):
+
+    def learn(self, number_iterations, terminal_state):
         """
         Modify the policy. TODO
         """
-        
+        t = 0
+        learning_rate = 0
+        while t < number_iterations:
+            self.taxi.set_random_position()
+            t += 1
+            learning_rate = 1 / t
+            while self.position != self.task.targets[0][0]:
+                action = self.policy(self.taxi.position)
+                self.policy.updateQ(self.position,action,self.reward,learning_rate)
+            
     def play(self):
         """
         Use the policy to take action during all the process (which lasts number_of_actions)
@@ -60,9 +68,9 @@ class Taxi(object):
                 self.tasks.passengers[0][2] = True
             if self.position == self.tasks.targets[0][0]:
                 # The passenger is now in the taxi ! 
-                self.reward += REWARD_TARGET
+                self.reward = REWARD_TARGET
         else:
-            self.reward += REWARD_ERROR
+            self.reward = REWARD_ERROR
 
     def set_authorized_positions(self, path):
         """
