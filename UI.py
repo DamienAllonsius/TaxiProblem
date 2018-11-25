@@ -3,11 +3,12 @@ This is the User Interface where we draw the environment.
 We use pygame for that.
 """
 import pygame.mixer
+from variables import * 
 from pygame.locals import *
 import time
+
 pygame.init()
-fontsize = 30
-myfont = pygame.font.SysFont("monospace", fontsize)
+myfont = pygame.font.SysFont("monospace", FONTSIZE)
 
 class UI(object):
     """
@@ -16,7 +17,8 @@ class UI(object):
     The target is the red small circle
     TODO : include the target (square of the same color as the passenger)
     """
-    def __init__(self, environment):
+    def __init__(self, environment, agent):
+        self.agent = agent
         self.environment = environment
         self.window = pygame.display.set_mode((0,0))
         self.width = pygame.display.Info().current_w
@@ -24,18 +26,18 @@ class UI(object):
         self.size_squares = 100
         self.key_pressed = False
 
-    def draw_reward_label(self):
+    def draw_reward_label(self, myfont):
         """
         This function draws the current reward of the Agent
         """
-        label = myfont.render("Reward = "+str(self.environment.reward), 3, (255, 255, 255))                        
+        label = myfont.render("Reward = "+str(self.agent.reward), 3, (255, 255, 255))                        
         self.window.blit(label, (0,0))
             
     def draw_taxi(self):
         """
         This function draws the taxi as a green circle
         """
-        pygame.draw.circle(self.window, (0,255,0),(self.environment.agent_position[0] * self.size_squares + self.size_squares // 2, self.environment.agent_position[1]* self.size_squares + self.size_squares // 2), self.size_squares // 4)
+        pygame.draw.circle(self.window, (0,255,0),(self.agent.position[1] * self.size_squares + self.size_squares // 2, self.agent.position[0]* self.size_squares + self.size_squares // 2), self.size_squares // 4)
         
     def draw_passengers(self):
         """
@@ -43,9 +45,19 @@ class UI(object):
         The location of the passenger is coded in the file domain/example_domain with the character R
         TODO : add more passengers
         """
-        pygame.draw.circle(self.window, (255,0,0) ,(self.environment.passenger_position[0] * self.size_squares + self.size_squares // 2, self.environment.passenger_position[1]* self.size_squares + self.size_squares // 2), self.size_squares // 20)
+        pygame.draw.circle(self.window, (255,0,0) ,(self.environment.terminal_position[1] * self.size_squares + self.size_squares // 2, self.environment.terminal_position[0]* self.size_squares + self.size_squares // 2), self.size_squares // 20)
 
-    def draw_all(self):
+    def draw_grid(self):
+        """
+        Draw the grid : white squares when the positions are allowed
+        """
+        for [i,j] in self.environment.authorized_positions_ij:
+            pygame.draw.rect(self.window, (255,255,255),
+                             (j * self.size_squares,
+                              i * self.size_squares,
+                              self.size_squares,
+                              self.size_squares),1)
+    def draw_all(self, myfont):
         """
         this function draws all the components of the environment:
         the domain
@@ -55,36 +67,18 @@ class UI(object):
         """
 
         # First draw the square representing the grid
-        self.window.fill((0, 0, 0))
-        i = -1
-        for line_position in self.environment.authorized_positions:
-            i += 1
-            j = -1
-            for position in line_position:
-                j += 1
-                if position:
-                    pygame.draw.rect(self.window, (255,255,255),
-                                     (j * self.size_squares,
-                                      i * self.size_squares,
-                                      self.size_squares,
-                                      self.size_squares),1)
+       
         # Then draw the components of the environment
+        self.window.fill((0, 0, 0))
+        self.draw_grid()
         self.draw_passengers()
         self.draw_taxi()
-        self.draw_reward_label()
+        self.draw_reward_label(myfont)
         pygame.display.flip()
 
-
+        # Exit the UI when key ESCAPE is pressed
         for event in pygame.event.get():
             if (event.type == pygame.KEYDOWN):
-                    # if (event.key == K_UP):
-                    #     self.taxi.move(NORTH)
-                    # if (event.key == K_DOWN):
-                    #     self.taxi.move(SOUTH)
-                    # if (event.key == K_LEFT):
-                    #     self.taxi.move(WEST)
-                    # if (event.key == K_RIGHT):
-                    #     self.taxi.move(EAST)
                 if (event.key == pygame.K_ESCAPE):
                     self.key_pressed = True
 

@@ -8,87 +8,81 @@ from variables import *
 class Environment(object):
 
     def __init__(self):
-        self.reward = 0
-        self.agent_position = []
-        self.passenger_position = []
+        """
+        When the agent reaches the terminal position, the experiment ends.
+        self.authorized_positions_bool contains boolean entries : 
+        True : the position is allowed by the geometry of the domain
+        False otherwise.
+        self.authorized_positions_ij contains lists of two elements [j,i] :
+        x = j, y = i is an allowed position.
+        """
         self.terminal_position = []
         # TOFIX : for the moment terminal_position = passenger_position
-        self.authorized_positions = []
+        self.authorized_positions_bool = []
+        self.authorized_positions_ij = []
         self.number_authorized_positions = 0
-        self.init_domain()
-        self.set_initial_random_position()
-        
-    def init_domain(self):
+    
+    def init_domain(self, path):
         """
-        set the authorized_positions according to the file domain/example_domain
-        set the number of authorized positions 
-        set the terminal postion
+        set the authorized_positions_ij and authorized_positions_bool variables  according to the file : domain/example_domain
+        set the number of authorized positions
+        set the terminal postion. For the moment this terminal position is the passenger's position.
         """
-        file_object = open("domain/example_domain", 'r')
+        number_authorized_positions = 0
+        file_object = open(path, 'r')
         i = -1
         for line in file_object.readlines():
             i += 1
             j = -1
-            current_line = []
+            # current_line_bool (resp. _ij) is a list of bools (resp. of positions [i,j]). It is True when the position is allowed and False otherwise. The current_line_ij contains the position of the current character if the corresponding value of current_line_bool is true.
+            current_line_bool = []
+            current_line_ij = []
             for character in line:
                 j += 1
                 if character == "-":
-                    current_line.append(False)
+                    # here we are facing a wall
+                    current_line_bool.append(False)
                 elif character == " ":
-                    current_line.append(True)
-                    self.number_authorized_positions += 1
+                    # an empty space where the agent can move to
+                    current_line_ij.append([i, j])
+                    current_line_bool.append(True)
+                    number_authorized_positions += 1
                 elif character == "R":
-                    current_line.append(True)
-                    self.number_authorized_positions += 1
-                    self.passenger_position = [j,i]
-                    self.terminal_position = [j,i]
-            self.authorized_positions.append(current_line)
-        
-    def reset(self):
-        """
-        restart the variables of the environment : 
-        set the reward to 0
-        set agent_position to a random position
-        (TODO set the passenger position to their initial position)
-        """
-        self.reward = 0
-        self.set_initial_random_position()
-        
-    def set_initial_random_position(self):
+                    # The location of the "Red" passenger
+                    # There must be only 1 caracter R.
+                    current_line_bool.append(True)
+                    current_line_ij.append([i, j])
+                    number_authorized_positions += 1
+                    self.terminal_position = [i,j]
+            self.authorized_positions_bool.append(current_line_bool)
+            self.authorized_positions_ij += current_line_ij
+            self.number_authorized_positions = number_authorized_positions
+    def get_initial_random_position(self):
         """
         get a random position among the authorized positions 
-        (i.e. the positions (i,j) such that self.authorized position(i,j)=True)
+        (i.e. a list [i,j] such that self.authorized_position at (i,j) is True)
         We get a number between 1 and 
         number_authorized_positions - number of terminal position
         (we exclude the passengers' position at the begining)
         """
-        random_position = random.randrange(1,self.number_authorized_positions - len(self.terminal_position)/2+1)
-        count_true = 0
-        i = -1
-        for line in self.authorized_positions:
-            i += 1
-            j = -1
-            for bool in line:
-                j += 1
-                # we exclude the passengers' positions
-                if bool and ([j,i] not in self.terminal_position):
-                    count_true += 1
-                    if count_true == random_position:
-                        self.agent_position = [j ,i]
-                        break
-        
-    def update(self, action):
+        random_position = random.randrange(self.number_authorized_positions - 1)
+        initial_possible_positions = self.authorized_positions_ij.copy()
+        initial_possible_positions.remove(self.terminal_position)
+        return initial_possible_positions[random_position]                        
+    def update(self, previous_position, action):
         """
-        This method moves the taxi in direction NORTH SOUTH EAST or WEST if the target position is allowed by the domain. 
-        Otherwise the Taxi get a penalty of -1 on its reward and stays at his place.
+        This method returns the taxi position when he takes an action NORTH SOUTH EAST or WEST and the corresponding reward.
+        The agent get a penalty for every move and when he hits the wall. He gets a positive reward when reaching the passenger's location.
         """
         new_position = [0,0]
+        reward = REWARD_MOVE
         for i in range(2):
-            new_position[i] = self.agent_position[i] + action[i]
-        if self.authorized_positions[new_position[1]][new_position[0]]:
-            self.agent_position = new_position
-            self.reward += REWARD_MOVE
-            if self.agent_position == self.passenger_position:
-                self.reward = REWARD_PASSENGER
+            new_position[i] = previous_position[i] + action[i]
+        if self.authorized_positions_bool[new_position[0]][new_position[1]]:
+            if new_position == self.terminal_position:
+                reward += REWARD_TERMINAL
         else:
-            self.reward = REWARD_ERROR
+            reward += REWARD_ERROR
+            new_position = previous_position
+
+        return [reward, new_position]
