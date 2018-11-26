@@ -1,12 +1,15 @@
 # TaxiProblem
-The taxi problem solved with reinforcement learning (MAXQ value fonction decomposition). Language : Python 3.6
+-  Language : Python 3.6
 
-- For the moment, the taxi (green circle) has just to reach its target (the red small circle) as shown 
+- Objective : solve the taxi problem with reinforcement learning (MAXQ value fonction decomposition).
+
+- For the moment, the taxi (green circle) has just to reach its target (the red small circle) as shown below. Only plain Q-Learning is implemented for the moment
 
 <p align="center">
 <img width="60%" src="screenshots/example.gif">
 </p>
-- How to use ? Just run the main file
+
+- How to use it ? Just run the main file
 ```
 python3 main.py
 ```
