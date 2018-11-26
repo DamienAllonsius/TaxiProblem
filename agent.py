@@ -1,7 +1,6 @@
 """
 This class represents the taxi divers. He has to learn how to solve his tasks. This class is essentially empty for the moment because their is only one task and no hierarchy for the moment.
 """
-import random
 from task import *
 class Agent(object):
     """
@@ -18,3 +17,12 @@ class Agent(object):
         TODO make a function : learn_all_tasks
         """
         return self.task.learn()
+
+    def save_learned_task(self, path_file):
+        """
+        Save the Q function in the file : path_file
+        """
+        f = open(path_file, 'w' )
+        f.write('dict = ' + repr(self.Q_function) + '\n' )
+        f.close()
+    

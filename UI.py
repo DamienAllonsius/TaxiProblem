@@ -20,10 +20,10 @@ class UI(object):
     def __init__(self, environment, agent):
         self.agent = agent
         self.environment = environment
-        self.window = pygame.display.set_mode((0,0))
+        self.window = pygame.display.set_mode([600,500])
         self.width = pygame.display.Info().current_w
         self.height = pygame.display.Info().current_h
-        self.size_squares = 100
+        self.size_squares = 40
         self.key_pressed = False
 
     def draw_reward_label(self, myfont):
@@ -45,7 +45,7 @@ class UI(object):
         The location of the passenger is coded in the file domain/example_domain with the character R
         TODO : add more passengers
         """
-        pygame.draw.circle(self.window, (255,0,0) ,(self.environment.terminal_position[1] * self.size_squares + self.size_squares // 2, self.environment.terminal_position[0]* self.size_squares + self.size_squares // 2), self.size_squares // 20)
+        pygame.draw.circle(self.window, (255,0,0) ,(self.environment.terminal_position[1] * self.size_squares + self.size_squares // 2, self.environment.terminal_position[0]* self.size_squares + self.size_squares // 2), self.size_squares // 10)
 
     def draw_grid(self):
         """
@@ -82,7 +82,8 @@ class UI(object):
                 if (event.key == pygame.K_ESCAPE):
                     self.key_pressed = True
 
-
+    def save(self, frame):
+        pygame.image.save(self.window, "screenshots/screenshot" + str(frame) + ".jpeg")
             
 
 

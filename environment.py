@@ -3,7 +3,7 @@ This class is the environment in which the agent (here the taxi) evolves.
 It is a 2D-discrete grid, which features (geometry, location of the passenger) are written in the file domain/example_domain
 """
 
-import random
+import numpy as np
 from variables import * 
 class Environment(object):
 
@@ -65,7 +65,7 @@ class Environment(object):
         number_authorized_positions - number of terminal position
         (we exclude the passengers' position at the begining)
         """
-        random_position = random.randrange(self.number_authorized_positions - 1)
+        random_position = np.random.randint(self.number_authorized_positions - 1)
         initial_possible_positions = self.authorized_positions_ij.copy()
         initial_possible_positions.remove(self.terminal_position)
         return initial_possible_positions[random_position]                        

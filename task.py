@@ -4,7 +4,7 @@ For the moment, the only task available is :
 Go to the (unique) passenger.
 """
 from variables import *
-import random
+
 class Task(object):
     """
     The task needs an environment to take actions 
@@ -76,3 +76,14 @@ class Task(object):
                 action = d
                 m = max(m,dict_actions[d])
         return eval(action)
+
+
+    
+    def save_learned_task(self, path_file):
+        """
+        Save the Q function in the file path_file
+        """
+        f = open(path_file, 'w' )
+        f.write('Q_function = ' + repr(self.Q_function) + '\n' )
+        f.close()
+    
