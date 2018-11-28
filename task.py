@@ -4,7 +4,7 @@ For the moment, the only task available is :
 Go to the (unique) passenger.
 """
 from variables import *
-
+import numpy as np
 class Task(object):
     """
     The task needs an environment to take actions 
@@ -54,15 +54,18 @@ class Task(object):
             self.Q_function[str(current_position)][str(action)] *= (1 - learning_rate)
             self.Q_function[str(current_position)][str(action)] += learning_rate * (reward + max_value_action)
     
-    def act(self, position):
+    def act(self, position, play_bool):
         """
         This function codes the output of the policy. 
         Given a position, returns an action, which, for the moment, can only be one of the DIRECTIONS. The action is chosen as follow:
-        action = argmax_{a} Q(current_position,a)
+        action = argmax_{a} Q(current_position,a) in the playing phase. In the learning phase, there is a probability to take a random action
         TODO : hierarchical learning
         """
-        return self.find_max_action(self.Q_function[str(position)])
-    
+        if play_bool or np.random.rand() > PROBABILITY_RANDOM_ACTION:
+            return self.find_max_action(self.Q_function[str(position)])
+        else:
+            return DIRECTIONS[np.random.randint(4)]
+        
     def find_max_action(self, dict_actions):
         """
         Take the maximum over all dictionnary's actions dict_actions.

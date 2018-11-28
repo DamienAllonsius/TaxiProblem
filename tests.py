@@ -87,7 +87,7 @@ class Tests:
         agent = Agent(self.environment.get_initial_random_position())
         agent.task.Q_function = {'[1,2]' : {'NORTH' : 0, 'SOUTH' : 100, '"EAST"' : -45, 'WEST' : 1}, '[4,7]' : {'NORTH' : 0, 'SOUTH' : 0, '"EAST"' : 0, 'WEST' : 1}, '[2,5]' : {'NORTH' : -1, 'SOUTH' : 1, '"EAST"' : -4, 'WEST' : 1000} }
 
-        if agent.task.act('[1,2]') != SOUTH or agent.task.act('[2,5]') != WEST:
+        if agent.task.act('[1,2]', True) != SOUTH or agent.task.act('[2,5]', True) != WEST:
             print("TEST test_act FAILURE")
             return False
         return True

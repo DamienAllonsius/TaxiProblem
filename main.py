@@ -5,8 +5,11 @@ from tests import *
 from UI import *
 from tqdm import tqdm
 import time
+import numpy as np
 
 def learn():
+     # We are in the learning phase, so play = False
+     play_bool = False
 
      # The Q function can be saved
      learn_from_file = True
@@ -20,12 +23,13 @@ def learn():
           agent.task.first_visit_Q(current_position)
           while current_position != environment.terminal_position:
                # Only one task for the moment
-               action = agent.task.act(current_position)
+               action = agent.task.act(current_position, play_bool)
                [reward, new_position] = environment.update(current_position, action)
                agent.task.updateQ(current_position, action, new_position, reward, t)
                current_position = new_position
 
 def play(screenshots):
+     play_bool = True
      agent.position = [1, 1]#environment.get_initial_random_position()
      time.sleep(0.5)
      print("Creating the User Interface...")
@@ -36,8 +40,8 @@ def play(screenshots):
           frame += 1
           if screenshots:
                user_interface.save(frame)
-          time.sleep(0.1)
-          action = agent.task.act(agent.position)
+          time.sleep(1)
+          action = agent.task.act(agent.position, play_bool)
           [immediate_reward, new_position] = environment.update(agent.position, action)
           agent.reward += immediate_reward
           agent.position = new_position
@@ -56,8 +60,7 @@ Tests().main()
 # Initialize the data
 print("Reading the environment...")
 environment = Environment()
-domain_file = "example_domain_3"
-environment.init_domain("domain/" + domain_file)
+environment.init_domain(DOMAIN_SETTING)
 agent = Agent(environment.get_initial_random_position())
 
 learn()

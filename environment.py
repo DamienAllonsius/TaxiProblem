@@ -2,9 +2,9 @@
 This class is the environment in which the agent (here the taxi) evolves.
 It is a 2D-discrete grid, which features (geometry, location of the passenger) are written in the file domain/example_domain
 """
-
 import numpy as np
-from variables import * 
+from variables import *
+
 class Environment(object):
 
     def __init__(self):
